@@ -1,0 +1,95 @@
+{
+  "name": "Mosses Autonomous Loop",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300],
+      "webhookId": ""
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"claude-sonnet-4-20250514\",\n  \"max_tokens\": 2048,\n  \"system\": \"คุณเป็น Orchestrator ของ Mosses ตาม orchestrator.md. ส่งออกเฉพาะ JSON ในรูปแบบ {\\\"tasks\\\": [{\\\"agent\\\": \\\"ชื่อ agent\\\", \\\"prompt\\\": \\\"ข้อความ\\\"}]} เท่านั้น.\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"ตอนนี้เวลา \" + $now.toISO() + \". กำหนดงานที่ควรทำในรอบนี้ตาม ECOSYSTEM pipeline. ส่งออกเฉพาะ JSON: {\\\"tasks\\\": [...]}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "call-orchestrator",
+      "name": "Call Orchestrator (Claude)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300],
+      "credentials": { "httpHeaderAuth": { "id": "ANTHROPIC_CREDENTIAL_ID", "name": "Anthropic API" } },
+      "notesInFlow": true,
+      "notes": "ใช้ Anthropic API key ใน Header: x-api-key, anthropic-version: 2023-06-01"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json;\nconst content = body.content && body.content[0];\nconst text = content && content.text ? content.text : '';\nlet tasks = [];\ntry {\n  const parsed = JSON.parse(text.replace(/^[\\s\\S]*?\\{/, '{').replace(/\\}[\\s\\S]*$/, '}'));\n  tasks = Array.isArray(parsed.tasks) ? parsed.tasks : [];\n} catch (e) {\n  tasks = [];\n}\nreturn tasks.map(t => ({ json: { agent: t.agent || '', prompt: t.prompt || '' } }));"
+      },
+      "id": "parse-tasks",
+      "name": "Parse Task List",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "loop-tasks",
+      "name": "Loop Over Tasks",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"claude-sonnet-4-20250514\",\n  \"max_tokens\": 2048,\n  \"system\": \"คุณเป็น Agent ตามบทบาทใน Mosses. ทำตาม prompt ที่ได้รับ. สรุปผลเป็นไทย.\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": $json.prompt\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "call-agent",
+      "name": "Call Agent (Claude)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 300],
+      "credentials": { "httpHeaderAuth": { "id": "ANTHROPIC_CREDENTIAL_ID", "name": "Anthropic API" } },
+      "notes": "ปรับ system ตาม $json.agent (devops/data-analyst/...) โดยใช้ Switch node แยก agent แล้วใส่ prompt แต่ละตัว"
+    },
+    {
+      "parameters": {},
+      "id": "noop-after-loop",
+      "name": "After All Tasks",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1340, 300]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": { "main": [[{ "node": "Call Orchestrator (Claude)", "type": "main", "index": 0 }]] },
+    "Call Orchestrator (Claude)": { "main": [[{ "node": "Parse Task List", "type": "main", "index": 0 }]] },
+    "Parse Task List": { "main": [[{ "node": "Loop Over Tasks", "type": "main", "index": 0 }]] },
+    "Loop Over Tasks": { "main": [[{ "node": "Call Agent (Claude)", "type": "main", "index": 0 }], [{ "node": "After All Tasks", "type": "main", "index": 0 }]] },
+    "Call Agent (Claude)": { "main": [[{ "node": "Loop Over Tasks", "type": "main", "index": 0 }]] }
+  },
+  "pinData": {},
+  "settings": { "executionOrder": "v1" },
+  "staticData": null,
+  "tags": [{ "name": "Mosses", "createdAt": "2026-02-07T00:00:00.000Z", "updatedAt": "2026-02-07T00:00:00.000Z" }],
+  "triggerCount": 1,
+  "meta": { "templateCredsSetupCompleted": false }
+}

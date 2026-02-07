@@ -1,0 +1,10 @@
+name = "flybridge"
+main = "src/index.js"
+compatibility_date = "2024-12-01"
+
+# Secrets (ตั้งค่าผ่าน wrangler secret put):
+# GITHUB_PAT     — GitHub Personal Access Token
+# BRIDGE_API_KEY — API key สำหรับ Claude.ai เรียก Worker
+
+[vars]
+DEFAULT_OWNER = "bowbozaa"

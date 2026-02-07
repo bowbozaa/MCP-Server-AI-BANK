@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+.wrangler/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Secrets
+.env
+.env.local
+.dev.vars
+
+# Build
+dist/
+*.zip
+
+# Sensitive files
+*.dmg
+รหัส.txt
+*.credentials
+*.secret
