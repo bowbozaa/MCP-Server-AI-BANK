@@ -61,5 +61,29 @@ credentials/
 *.pdf
 docs/build/
 
+# Docker
+docker-compose*.yml
+compose*.yaml
+Dockerfile.dev
+.dockerignore
+
+# Binary files
+*.dmg
+*.exe
+*.app
+*.apk
+*.ipa
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
 # Keep docs folder structure
 !docs/README.md
+
+# Allow specific docker files if needed
+!docker-compose.yml
+!Dockerfile
