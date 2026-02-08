@@ -28,4 +28,4 @@ MAX_AGENTS = "17"
 # Secrets (set via: wrangler secret put SECRET_NAME)
 # - ANTHROPIC_API_KEY
 # - RUNNER_API_KEY
-# - LINE_NOTIFY_TOKEN
+# - SLACK_WEBHOOK_URL

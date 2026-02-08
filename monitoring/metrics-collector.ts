@@ -13,7 +13,7 @@ interface Metric {
 interface MetricsConfig {
   supabaseUrl: string;
   supabaseKey: string;
-  lineNotifyToken: string;
+  slackWebhookUrl: string;
 }
 
 export class MetricsCollector {
@@ -99,17 +99,20 @@ export class MetricsCollector {
   }
 
   /**
-   * Send LINE alert
+   * Send Slack alert
    */
   private async sendAlert(message: string): Promise<void> {
     try {
-      await fetch('https://notify-api.line.me/api/notify', {
+      await fetch(this.config.slackWebhookUrl, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.config.lineNotifyToken}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
-        body: new URLSearchParams({ message }),
+        body: JSON.stringify({
+          text: message,
+          username: 'MOSSES Metrics',
+          icon_emoji: ':chart_with_upwards_trend:',
+        }),
       });
     } catch (error) {
       console.error('Failed to send alert:', error);

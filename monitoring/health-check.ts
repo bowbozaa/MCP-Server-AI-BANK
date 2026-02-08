@@ -12,7 +12,7 @@ interface HealthCheckResult {
 }
 
 interface AlertConfig {
-  lineNotifyToken: string;
+  slackWebhookUrl: string;
   alertThreshold: {
     responseTime: number; // ms
     errorRate: number; // percentage
@@ -83,27 +83,30 @@ export class HealthCheckMonitor {
   }
 
   /**
-   * Send LINE alert
+   * Send Slack alert
    */
   private async sendAlert(result: HealthCheckResult): Promise<void> {
     const message = this.formatAlertMessage(result);
 
     try {
-      await fetch('https://notify-api.line.me/api/notify', {
+      await fetch(this.config.slackWebhookUrl, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.config.lineNotifyToken}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
-        body: new URLSearchParams({ message }),
+        body: JSON.stringify({
+          text: message,
+          username: 'MOSSES Monitor',
+          icon_emoji: ':robot_face:',
+        }),
       });
     } catch (error) {
-      console.error('Failed to send LINE alert:', error);
+      console.error('Failed to send Slack alert:', error);
     }
   }
 
   /**
-   * Format alert message for LINE
+   * Format alert message for Slack
    */
   private formatAlertMessage(result: HealthCheckResult): string {
     const emoji = result.status === 'down' ? '🔴' : '⚠️';
@@ -147,7 +150,7 @@ export default {
     ctx: ExecutionContext
   ): Promise<void> {
     const monitor = new HealthCheckMonitor({
-      lineNotifyToken: env.LINE_NOTIFY_TOKEN,
+      slackWebhookUrl: env.SLACK_WEBHOOK_URL,
       alertThreshold: {
         responseTime: 3000, // 3s
         errorRate: 5, // 5%

@@ -14,7 +14,7 @@ import Anthropic from '@anthropic-ai/sdk';
 interface Env {
   ANTHROPIC_API_KEY: string;
   RUNNER_API_KEY: string;
-  LINE_NOTIFY_TOKEN: string;
+  SLACK_WEBHOOK_URL: string;
   AGENT_CACHE: KVNamespace;
   DB: D1Database;
 }
@@ -242,8 +242,8 @@ async function runAgent(
       success: false,
     });
 
-    // Send LINE alert for critical errors
-    await sendLineAlert(env.LINE_NOTIFY_TOKEN, `🔴 Agent Error\n\nAgent: ${agentName}\nError: ${errorMessage}`);
+    // Send Slack alert for critical errors
+    await sendSlackAlert(env.SLACK_WEBHOOK_URL, `🔴 Agent Error\n\nAgent: ${agentName}\nError: ${errorMessage}`);
 
     throw error;
   }
@@ -276,19 +276,22 @@ async function logAgentRun(
 }
 
 /**
- * Send LINE alert
+ * Send Slack alert
  */
-async function sendLineAlert(token: string, message: string): Promise<void> {
+async function sendSlackAlert(webhookUrl: string, message: string): Promise<void> {
   try {
-    await fetch('https://notify-api.line.me/api/notify', {
+    await fetch(webhookUrl, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
       },
-      body: new URLSearchParams({ message }),
+      body: JSON.stringify({
+        text: message,
+        username: 'MOSSES Agent Runner',
+        icon_emoji: ':robot_face:',
+      }),
     });
   } catch (error) {
-    console.error('Failed to send LINE alert:', error);
+    console.error('Failed to send Slack alert:', error);
   }
 }
