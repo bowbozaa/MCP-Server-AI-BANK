@@ -1,30 +1,91 @@
 # Dependencies
 node_modules/
-.wrangler/
+package-lock.json
 
-# OS files
-.DS_Store
-Thumbs.db
-desktop.ini
-nul
+# Environment variables
+.env
+.env.local
+.env.*.local
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
-# Secrets
-.env
-.env.local
-.dev.vars
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+nul
 
-# Build
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
 dist/
-*.zip
+build/
+out/
+.next/
+.vercel/
 
-# Sensitive files
-*.dmg
-รหัส.txt
-*.credentials
+# Testing
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Secrets (important!)
+*.key
+*.pem
 *.secret
+secrets/
+credentials/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Documentation builds
+*.pdf
+docs/build/
+
+# Docker
+docker-compose*.yml
+compose*.yaml
+Dockerfile.dev
+.dockerignore
+
+# Binary files
+*.dmg
+*.exe
+*.app
+*.apk
+*.ipa
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# Keep docs folder structure
+!docs/README.md
+
+# Allow specific docker files if needed
+!docker-compose.yml
+!Dockerfile
