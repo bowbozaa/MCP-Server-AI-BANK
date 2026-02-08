@@ -1,0 +1,27 @@
+# Cloudflare Workers Configuration for Monitoring
+
+name = "mosses-monitoring"
+main = "health-check.ts"
+compatibility_date = "2024-01-01"
+
+# Cron triggers for automated monitoring
+[triggers]
+crons = [
+  "*/5 * * * *",  # Every 5 minutes
+]
+
+# Environment variables (secrets via wrangler secret put)
+[vars]
+SUPABASE_URL = "https://your-project.supabase.co"
+VERCEL_DEPLOY_URL = "https://your-app.vercel.app"
+
+# Bindings for KV storage
+[[kv_namespaces]]
+binding = "METRICS_KV"
+id = "your-kv-id"
+
+# D1 Database for metrics storage
+[[d1_databases]]
+binding = "DB"
+database_name = "monitoring_db"
+database_id = "your-d1-id"
