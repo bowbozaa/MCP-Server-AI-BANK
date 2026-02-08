@@ -1,12 +1,36 @@
 {
   "permissions": {
     "allow": [
+      "Bash(claude --agent orchestrator:*)",
+      "Bash(claude --agent architect:*)",
+      "Bash(claude --agent n8n-engineer:*)",
+      "Bash(claude --agent frontend-dev:*)",
+      "Bash(claude --agent code-reviewer:*)",
+      "Bash(claude --agent debugger:*)",
+      "Bash(claude --agent deployer:*)",
+      "Bash(claude --agent content-strategist:*)",
+      "Bash(claude --agent seo-optimizer:*)",
+      "Bash(claude --agent data-engineer:*)",
+      "Bash(claude --agent devops:*)",
+      "Bash(claude --agent data-analyst:*)",
       "Bash(claude --agent marketing-compliance:*)",
+      "Bash(claude --agent code-agent:*)",
+      "Bash(claude --agent content-agent:*)",
+      "Bash(claude --agent business-agent:*)",
+      "Bash(claude --agent security-agent:*)",
+      "Bash(claude:*)",
       "Bash(gh auth status:*)",
+      "Bash(gh auth login:*)",
+      "Bash(gh repo create:*)",
       "Bash(npx wrangler:*)",
       "Bash(git init:*)",
-      "Bash(gh auth login:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git rm:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git status:*)",
+      "Bash(git branch:*)"
     ]
   }
 }
