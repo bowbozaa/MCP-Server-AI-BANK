@@ -1,0 +1,11 @@
+name = "mosses-agent-runner"
+main = "src/index.js"
+compatibility_date = "2024-12-01"
+
+# Secrets (set via: wrangler secret put <NAME>)
+# RUNNER_API_KEY   — Bearer token for n8n/external callers
+# ANTHROPIC_API_KEY — Claude API key
+
+[vars]
+DEFAULT_MODEL = "claude-sonnet-4-5-20250929"
+MAX_TOKENS = 4096

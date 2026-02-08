@@ -1,0 +1,14 @@
+{
+  "name": "mosses-agent-runner",
+  "version": "1.0.0",
+  "description": "Mosses Autonomous Agent Runner — Cloudflare Worker proxy for Claude API with 13 agent roles",
+  "main": "src/index.js",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}

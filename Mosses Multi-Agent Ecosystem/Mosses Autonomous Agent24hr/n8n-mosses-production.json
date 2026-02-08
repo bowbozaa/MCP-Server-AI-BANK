@@ -1,0 +1,432 @@
+{
+  "name": "Mosses Autonomous Orchestrator v2 (Production)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "triggerAtHour": 6 }]
+        }
+      },
+      "id": "schedule-morning",
+      "name": "Morning 06:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0],
+      "notes": "Health check + Daily plan"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "triggerAtHour": 9 }]
+        }
+      },
+      "id": "schedule-content",
+      "name": "Content 09:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 400],
+      "notes": "Content production + Compliance"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "triggerAtHour": 14 }]
+        }
+      },
+      "id": "schedule-analytics",
+      "name": "Analytics 14:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 800],
+      "notes": "Data analysis + Report"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "triggerAtHour": 18 }]
+        }
+      },
+      "id": "schedule-maintenance",
+      "name": "Maintenance 18:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 1200],
+      "notes": "System maintenance"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "triggerAtHour": 22 }]
+        }
+      },
+      "id": "schedule-summary",
+      "name": "Summary 22:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 1600],
+      "notes": "Daily summary + Tomorrow plan"
+    },
+
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "round", "name": "round", "value": "morning", "type": "string" },
+            { "id": "run_id", "name": "run_id", "value": "={{ 'run_' + $now.format('yyyyMMdd_HHmmss') }}", "type": "string" },
+            { "id": "timestamp", "name": "timestamp", "value": "={{ $now.toISO() }}", "type": "string" },
+            { "id": "day_of_week", "name": "day_of_week", "value": "={{ $now.format('EEEE') }}", "type": "string" }
+          ]
+        }
+      },
+      "id": "ctx-morning",
+      "name": "Context: Morning",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [250, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "round", "name": "round", "value": "content", "type": "string" },
+            { "id": "run_id", "name": "run_id", "value": "={{ 'run_' + $now.format('yyyyMMdd_HHmmss') }}", "type": "string" },
+            { "id": "timestamp", "name": "timestamp", "value": "={{ $now.toISO() }}", "type": "string" },
+            { "id": "day_of_week", "name": "day_of_week", "value": "={{ $now.format('EEEE') }}", "type": "string" }
+          ]
+        }
+      },
+      "id": "ctx-content",
+      "name": "Context: Content",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [250, 400]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "round", "name": "round", "value": "analytics", "type": "string" },
+            { "id": "run_id", "name": "run_id", "value": "={{ 'run_' + $now.format('yyyyMMdd_HHmmss') }}", "type": "string" },
+            { "id": "timestamp", "name": "timestamp", "value": "={{ $now.toISO() }}", "type": "string" }
+          ]
+        }
+      },
+      "id": "ctx-analytics",
+      "name": "Context: Analytics",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [250, 800]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "round", "name": "round", "value": "maintenance", "type": "string" },
+            { "id": "run_id", "name": "run_id", "value": "={{ 'run_' + $now.format('yyyyMMdd_HHmmss') }}", "type": "string" },
+            { "id": "timestamp", "name": "timestamp", "value": "={{ $now.toISO() }}", "type": "string" }
+          ]
+        }
+      },
+      "id": "ctx-maintenance",
+      "name": "Context: Maintenance",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [250, 1200]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "round", "name": "round", "value": "summary", "type": "string" },
+            { "id": "run_id", "name": "run_id", "value": "={{ 'run_' + $now.format('yyyyMMdd_HHmmss') }}", "type": "string" },
+            { "id": "timestamp", "name": "timestamp", "value": "={{ $now.toISO() }}", "type": "string" }
+          ]
+        }
+      },
+      "id": "ctx-summary",
+      "name": "Context: Summary",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [250, 1600]
+    },
+
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.AGENT_RUNNER_URL }}/run",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"agent\": \"devops\",\n  \"userMessage\": \"รอบเช้า {{ $json.timestamp }} ({{ $json.day_of_week }})\\n\\nHealth check ทุก service:\\n1. ตรวจสถานะ Workers, Supabase, n8n, Vercel\\n2. Response time ผิดปกติไหม\\n3. Error ที่เกิดเมื่อคืน\\n4. วางแผนงานวันนี้\\n\\nตอบเป็น JSON format:\\n{\\\"health\\\": {\\\"workers\\\": \\\"ok/warning/down\\\", \\\"supabase\\\": \\\"ok/warning/down\\\", \\\"n8n\\\": \\\"ok/warning/down\\\"},\\n \\\"alerts\\\": [],\\n \\\"daily_plan\\\": [],\\n \\\"score\\\": 0}\"\n}",
+        "options": {}
+      },
+      "id": "agent-morning",
+      "name": "Agent: DevOps Health",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 0],
+      "credentials": { "httpHeaderAuth": { "id": "RUNNER_CREDENTIAL_ID", "name": "Agent Runner" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.AGENT_RUNNER_URL }}/run",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"agent\": \"content-strategist\",\n  \"userMessage\": \"วันนี้วัน {{ $json.day_of_week }} {{ $now.format('yyyy-MM-dd') }}\\n\\nสร้าง content สำหรับวันนี้:\\n1. Content brief ตาม calendar\\n2. Hook + caption สำหรับ TikTok, FB, IG\\n3. แนะนำ hashtags + best time to post\\n4. ตรวจ compliance เบื้องต้น\\n\\nตอบเป็น JSON:\\n{\\\"content_briefs\\\": [{\\\"platform\\\": \\\"tiktok\\\", \\\"hook\\\": \\\"...\\\", \\\"caption\\\": \\\"...\\\", \\\"hashtags\\\": [], \\\"best_time\\\": \\\"...\\\"}],\\n \\\"compliance_check\\\": {\\\"status\\\": \\\"approved/needs_review\\\", \\\"issues\\\": []},\\n \\\"notes\\\": \\\"...\\\"}\"\n}",
+        "options": {}
+      },
+      "id": "agent-content",
+      "name": "Agent: Content Strategist",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 400],
+      "credentials": { "httpHeaderAuth": { "id": "RUNNER_CREDENTIAL_ID", "name": "Agent Runner" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.AGENT_RUNNER_URL }}/run",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"agent\": \"data-analyst\",\n  \"userMessage\": \"วิเคราะห์ข้อมูลวันที่ {{ $now.format('yyyy-MM-dd') }}\\n\\n1. ยอดขายวันนี้ เทียบเมื่อวาน/สัปดาห์ก่อน\\n2. Content performance (views, engagement)\\n3. Ad ROAS แต่ละ platform\\n4. Anomaly detection\\n5. Actionable recommendations\\n\\nตอบเป็น JSON:\\n{\\\"revenue\\\": {\\\"today\\\": 0, \\\"vs_yesterday\\\": \\\"+0%\\\"},\\n \\\"orders\\\": {\\\"count\\\": 0, \\\"aov\\\": 0},\\n \\\"top_product\\\": \\\"...\\\",\\n \\\"anomalies\\\": [],\\n \\\"recommendations\\\": [],\\n \\\"score\\\": 7}\"\n}",
+        "options": {}
+      },
+      "id": "agent-analytics",
+      "name": "Agent: Data Analyst",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 800],
+      "credentials": { "httpHeaderAuth": { "id": "RUNNER_CREDENTIAL_ID", "name": "Agent Runner" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.AGENT_RUNNER_URL }}/run",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"agent\": \"devops\",\n  \"userMessage\": \"Maintenance check {{ $now.format('yyyy-MM-dd HH:mm') }}\\n\\n1. Database size & performance\\n2. Error logs วันนี้\\n3. API rate limit usage\\n4. Storage usage (R2, Supabase)\\n5. แนะนำ cleanup ถ้าจำเป็น\\n\\nตอบเป็น JSON:\\n{\\\"db_status\\\": {\\\"size_mb\\\": 0, \\\"connections\\\": 0, \\\"slow_queries\\\": 0},\\n \\\"errors_today\\\": 0,\\n \\\"storage\\\": {\\\"r2_used\\\": \\\"0MB\\\", \\\"supabase_used\\\": \\\"0MB\\\"},\\n \\\"cleanup_actions\\\": [],\\n \\\"status\\\": \\\"healthy/warning/critical\\\"}\"\n}",
+        "options": {}
+      },
+      "id": "agent-maintenance",
+      "name": "Agent: DevOps Maintenance",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 1200],
+      "credentials": { "httpHeaderAuth": { "id": "RUNNER_CREDENTIAL_ID", "name": "Agent Runner" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.AGENT_RUNNER_URL }}/run",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"agent\": \"orchestrator\",\n  \"userMessage\": \"สรุปวันที่ {{ $now.format('yyyy-MM-dd') }}\\n\\nข้อมูลจากทุกรอบวันนี้:\\n- Morning: health check\\n- Content: content production\\n- Analytics: data analysis\\n- Maintenance: system maintenance\\n\\nสรุป:\\n1. Health status ตลอดวัน\\n2. Content ที่สร้าง/publish\\n3. ยอดขายรวม + metrics\\n4. ปัญหาที่เจอ + วิธีแก้\\n5. วางแผนพรุ่งนี้\\n6. ให้คะแนนวันนี้ 1-10\\n\\nตอบเป็น LINE-friendly format (emoji, กระชับ, อ่านง่าย)\"\n}",
+        "options": {}
+      },
+      "id": "agent-summary",
+      "name": "Agent: Daily Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 1600],
+      "credentials": { "httpHeaderAuth": { "id": "RUNNER_CREDENTIAL_ID", "name": "Agent Runner" } }
+    },
+
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst round = input.round || $('Context: Morning').first().json.round || 'unknown';\nconst run_id = input.run_id || $('Context: Morning').first().json.run_id || 'unknown';\nconst agentResponse = input.content || JSON.stringify(input);\n\n// Build LINE message\nconst roundEmoji = {\n  morning: '\\u{1F305}',\n  content: '\\u{1F4DD}',\n  analytics: '\\u{1F4CA}',\n  maintenance: '\\u{1F527}',\n  summary: '\\u{1F4C8}'\n};\nconst emoji = roundEmoji[round] || '\\u{1F916}';\n\n// Truncate for LINE (max 5000 chars)\nlet message = agentResponse;\nif (message.length > 4500) {\n  message = message.substring(0, 4500) + '\\n\\n... (truncated)';\n}\n\nconst lineMessage = `${emoji} Mosses ${round.toUpperCase()} Report\\n${new Date().toISOString().split('T')[0]}\\n\\n${message}`;\n\nreturn [{\n  json: {\n    round,\n    run_id,\n    agent_response: agentResponse,\n    line_message: lineMessage,\n    status: input.ok === false ? 'failed' : 'success',\n    error: input.error || null\n  }\n}];"
+      },
+      "id": "format-morning",
+      "name": "Format: Morning",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [750, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst round = 'content';\nconst run_id = $('Context: Content').first().json.run_id || 'unknown';\nconst agentResponse = input.content || JSON.stringify(input);\n\nlet message = agentResponse;\nif (message.length > 4500) {\n  message = message.substring(0, 4500) + '\\n\\n... (truncated)';\n}\n\nconst lineMessage = `\\u{1F4DD} Mosses CONTENT Report\\n${new Date().toISOString().split('T')[0]}\\n\\n${message}`;\n\nreturn [{\n  json: {\n    round,\n    run_id,\n    agent_response: agentResponse,\n    line_message: lineMessage,\n    status: input.ok === false ? 'failed' : 'success',\n    error: input.error || null\n  }\n}];"
+      },
+      "id": "format-content",
+      "name": "Format: Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [750, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst round = 'analytics';\nconst run_id = $('Context: Analytics').first().json.run_id || 'unknown';\nconst agentResponse = input.content || JSON.stringify(input);\n\nlet message = agentResponse;\nif (message.length > 4500) {\n  message = message.substring(0, 4500) + '\\n\\n... (truncated)';\n}\n\nconst lineMessage = `\\u{1F4CA} Mosses ANALYTICS Report\\n${new Date().toISOString().split('T')[0]}\\n\\n${message}`;\n\nreturn [{\n  json: {\n    round,\n    run_id,\n    agent_response: agentResponse,\n    line_message: lineMessage,\n    status: input.ok === false ? 'failed' : 'success',\n    error: input.error || null\n  }\n}];"
+      },
+      "id": "format-analytics",
+      "name": "Format: Analytics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [750, 800]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst round = 'maintenance';\nconst run_id = $('Context: Maintenance').first().json.run_id || 'unknown';\nconst agentResponse = input.content || JSON.stringify(input);\n\nlet message = agentResponse;\nif (message.length > 4500) {\n  message = message.substring(0, 4500) + '\\n\\n... (truncated)';\n}\n\nconst lineMessage = `\\u{1F527} Mosses MAINTENANCE Report\\n${new Date().toISOString().split('T')[0]}\\n\\n${message}`;\n\nreturn [{\n  json: {\n    round,\n    run_id,\n    agent_response: agentResponse,\n    line_message: lineMessage,\n    status: input.ok === false ? 'failed' : 'success',\n    error: input.error || null\n  }\n}];"
+      },
+      "id": "format-maintenance",
+      "name": "Format: Maintenance",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [750, 1200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst round = 'summary';\nconst run_id = $('Context: Summary').first().json.run_id || 'unknown';\nconst agentResponse = input.content || JSON.stringify(input);\n\nlet message = agentResponse;\nif (message.length > 4500) {\n  message = message.substring(0, 4500) + '\\n\\n... (truncated)';\n}\n\nconst lineMessage = `\\u{1F4C8} Mosses DAILY SUMMARY\\n${new Date().toISOString().split('T')[0]}\\n\\n${message}\\n\\n\\u{1F634} Good night, Mosses!`;\n\nreturn [{\n  json: {\n    round,\n    run_id,\n    agent_response: agentResponse,\n    line_message: lineMessage,\n    status: input.ok === false ? 'failed' : 'success',\n    error: input.error || null\n  }\n}];"
+      },
+      "id": "format-summary",
+      "name": "Format: Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [750, 1600]
+    },
+
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "agent_runs",
+        "fieldsToSend": {
+          "fieldValues": [
+            { "fieldName": "run_id", "fieldValue": "={{ $json.run_id }}" },
+            { "fieldName": "schedule_round", "fieldValue": "={{ $json.round }}" },
+            { "fieldName": "agent_name", "fieldValue": "=agent-runner" },
+            { "fieldName": "task_type", "fieldValue": "={{ $json.round }}" },
+            { "fieldName": "output_summary", "fieldValue": "={{ $json.agent_response.substring(0, 5000) }}" },
+            { "fieldName": "status", "fieldValue": "={{ $json.status }}" },
+            { "fieldName": "error_message", "fieldValue": "={{ $json.error }}" },
+            { "fieldName": "completed_at", "fieldValue": "={{ $now.toISO() }}" }
+          ]
+        }
+      },
+      "id": "log-supabase",
+      "name": "Log to Supabase",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1000, 800],
+      "credentials": { "supabaseApi": { "id": "SUPABASE_CREDENTIAL_ID", "name": "Supabase" } },
+      "notes": "Shared Supabase log node — all rounds write here"
+    },
+
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"{{ $env.LINE_USER_ID }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": {{ JSON.stringify($json.line_message) }}\n    }\n  ]\n}"
+      },
+      "id": "line-notify",
+      "name": "LINE Notify",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1250, 800],
+      "credentials": { "httpHeaderAuth": { "id": "LINE_CREDENTIAL_ID", "name": "LINE Messaging API" } },
+      "notes": "Shared LINE node — all rounds notify here"
+    }
+  ],
+
+  "connections": {
+    "Morning 06:00": {
+      "main": [[{ "node": "Context: Morning", "type": "main", "index": 0 }]]
+    },
+    "Content 09:00": {
+      "main": [[{ "node": "Context: Content", "type": "main", "index": 0 }]]
+    },
+    "Analytics 14:00": {
+      "main": [[{ "node": "Context: Analytics", "type": "main", "index": 0 }]]
+    },
+    "Maintenance 18:00": {
+      "main": [[{ "node": "Context: Maintenance", "type": "main", "index": 0 }]]
+    },
+    "Summary 22:00": {
+      "main": [[{ "node": "Context: Summary", "type": "main", "index": 0 }]]
+    },
+
+    "Context: Morning": {
+      "main": [[{ "node": "Agent: DevOps Health", "type": "main", "index": 0 }]]
+    },
+    "Context: Content": {
+      "main": [[{ "node": "Agent: Content Strategist", "type": "main", "index": 0 }]]
+    },
+    "Context: Analytics": {
+      "main": [[{ "node": "Agent: Data Analyst", "type": "main", "index": 0 }]]
+    },
+    "Context: Maintenance": {
+      "main": [[{ "node": "Agent: DevOps Maintenance", "type": "main", "index": 0 }]]
+    },
+    "Context: Summary": {
+      "main": [[{ "node": "Agent: Daily Summary", "type": "main", "index": 0 }]]
+    },
+
+    "Agent: DevOps Health": {
+      "main": [[{ "node": "Format: Morning", "type": "main", "index": 0 }]]
+    },
+    "Agent: Content Strategist": {
+      "main": [[{ "node": "Format: Content", "type": "main", "index": 0 }]]
+    },
+    "Agent: Data Analyst": {
+      "main": [[{ "node": "Format: Analytics", "type": "main", "index": 0 }]]
+    },
+    "Agent: DevOps Maintenance": {
+      "main": [[{ "node": "Format: Maintenance", "type": "main", "index": 0 }]]
+    },
+    "Agent: Daily Summary": {
+      "main": [[{ "node": "Format: Summary", "type": "main", "index": 0 }]]
+    },
+
+    "Format: Morning": {
+      "main": [[{ "node": "Log to Supabase", "type": "main", "index": 0 }]]
+    },
+    "Format: Content": {
+      "main": [[{ "node": "Log to Supabase", "type": "main", "index": 0 }]]
+    },
+    "Format: Analytics": {
+      "main": [[{ "node": "Log to Supabase", "type": "main", "index": 0 }]]
+    },
+    "Format: Maintenance": {
+      "main": [[{ "node": "Log to Supabase", "type": "main", "index": 0 }]]
+    },
+    "Format: Summary": {
+      "main": [[{ "node": "Log to Supabase", "type": "main", "index": 0 }]]
+    },
+
+    "Log to Supabase": {
+      "main": [[{ "node": "LINE Notify", "type": "main", "index": 0 }]]
+    }
+  },
+
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "tags": [
+    { "name": "autonomous" },
+    { "name": "production" },
+    { "name": "v2" }
+  ],
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": ""
+  }
+}

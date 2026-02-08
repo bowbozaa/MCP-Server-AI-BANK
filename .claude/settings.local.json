@@ -6,7 +6,16 @@
       "Bash(npx wrangler:*)",
       "Bash(git init:*)",
       "Bash(gh auth login:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git rm:*)",
+      "Bash(git commit:*)",
+      "Bash(gh repo create:*)",
+      "Bash(claude --agent orchestrator \"แนะนำตัวเอง\")",
+      "Bash(claude --agent architect:*)",
+      "Bash(claude --agent code-reviewer:*)",
+      "Bash(claude --agent debugger:*)",
+      "Bash(claude --agent deployer:*)",
+      "Bash(claude:*)"
     ]
   }
 }

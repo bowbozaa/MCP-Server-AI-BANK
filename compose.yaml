@@ -1,0 +1,10 @@
+services:
+  githubbridge:
+    image: githubbridge
+    build:
+      context: github-bridge-worker/github-bridge-worker
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+    ports:
+      - 3000:3000

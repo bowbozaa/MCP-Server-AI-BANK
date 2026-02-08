@@ -1,0 +1,432 @@
+{
+  "name": "🤖 Mosses Autonomous Orchestrator",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "id": "schedule-morning",
+      "name": "🌅 Morning (06:00)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0],
+      "notes": "Health check + Daily plan"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "schedule-content",
+      "name": "📝 Content (09:00)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 300],
+      "notes": "Content production + Compliance"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 14
+            }
+          ]
+        }
+      },
+      "id": "schedule-analytics",
+      "name": "📊 Analytics (14:00)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 600],
+      "notes": "Data analysis + Report"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 18
+            }
+          ]
+        }
+      },
+      "id": "schedule-maintenance",
+      "name": "🔧 Maintenance (18:00)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 900],
+      "notes": "System maintenance + Backup"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 22
+            }
+          ]
+        }
+      },
+      "id": "schedule-summary",
+      "name": "📈 Summary (22:00)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 1200],
+      "notes": "Daily summary + Tomorrow plan"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "round",
+              "name": "round",
+              "value": "={{ $node.name }}",
+              "type": "string"
+            },
+            {
+              "id": "run_id",
+              "name": "run_id",
+              "value": "={{ 'run_' + $now.format('yyyyMMdd_HHmmss') }}",
+              "type": "string"
+            },
+            {
+              "id": "timestamp",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "set-context-morning",
+      "name": "Set Context (Morning)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [250, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "round",
+              "name": "round",
+              "value": "content",
+              "type": "string"
+            },
+            {
+              "id": "run_id",
+              "name": "run_id",
+              "value": "={{ 'run_' + $now.format('yyyyMMdd_HHmmss') }}",
+              "type": "string"
+            },
+            {
+              "id": "day_of_week",
+              "name": "day_of_week",
+              "value": "={{ $now.format('EEEE') }}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "set-context-content",
+      "name": "Set Context (Content)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "round",
+              "name": "round",
+              "value": "analytics",
+              "type": "string"
+            },
+            {
+              "id": "run_id",
+              "name": "run_id",
+              "value": "={{ 'run_' + $now.format('yyyyMMdd_HHmmss') }}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "set-context-analytics",
+      "name": "Set Context (Analytics)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [250, 600]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "round",
+              "name": "round",
+              "value": "maintenance",
+              "type": "string"
+            },
+            {
+              "id": "run_id",
+              "name": "run_id",
+              "value": "={{ 'run_' + $now.format('yyyyMMdd_HHmmss') }}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "set-context-maintenance",
+      "name": "Set Context (Maintenance)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [250, 900]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "round",
+              "name": "round",
+              "value": "summary",
+              "type": "string"
+            },
+            {
+              "id": "run_id",
+              "name": "run_id",
+              "value": "={{ 'run_' + $now.format('yyyyMMdd_HHmmss') }}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "set-context-summary",
+      "name": "Set Context (Summary)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [250, 1200]
+    },
+    {
+      "parameters": {
+        "model": "claude-sonnet-4-5-20250929",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "คุณคือ Mosses DevOps Agent ทำ health check ระบบทุกเช้า\n\nตรวจสอบ:\n1. สถานะแต่ละ service (UP/DOWN/SLOW)\n2. Response time ผิดปกติไหม\n3. Error ที่เกิดขึ้นเมื่อคืน\n4. วางแผนงานวันนี้\n\nตอบเป็น JSON format:\n{\n  \"health\": {\"workers\": \"ok\", \"supabase\": \"ok\", \"n8n\": \"ok\"},\n  \"alerts\": [],\n  \"daily_plan\": [\"task1\", \"task2\"],\n  \"score\": 9\n}"
+            },
+            {
+              "role": "user",
+              "content": "=รันรอบเช้า {{ $now.format('yyyy-MM-dd HH:mm') }}\n\nHealth check results:\n{{ JSON.stringify($json.health_results || 'ยังไม่มีข้อมูล กรุณาวิเคราะห์จากข้อมูลที่มี') }}"
+            }
+          ]
+        }
+      },
+      "id": "claude-morning",
+      "name": "🧠 Claude: Morning Health",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [500, 0],
+      "notes": "ใช้ Anthropic credential"
+    },
+    {
+      "parameters": {
+        "model": "claude-sonnet-4-5-20250929",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "คุณคือ Mosses Content Strategist Agent\n\nงานวันนี้:\n1. สร้าง content brief ตาม content calendar\n2. เขียน hook + caption สำหรับ TikTok, FB, IG\n3. แนะนำ hashtags + best time to post\n4. ตรวจ compliance เบื้องต้น\n\nตอบเป็น JSON format:\n{\n  \"content_briefs\": [{\"platform\": \"tiktok\", \"hook\": \"...\", \"caption\": \"...\", \"hashtags\": [...], \"best_time\": \"...\"}],\n  \"compliance_check\": {\"status\": \"approved/needs_review\", \"issues\": []},\n  \"notes\": \"...\"\n}"
+            },
+            {
+              "role": "user",
+              "content": "=วันนี้วัน {{ $json.day_of_week }} {{ $now.format('yyyy-MM-dd') }}\nสร้าง content สำหรับวันนี้"
+            }
+          ]
+        }
+      },
+      "id": "claude-content",
+      "name": "🧠 Claude: Content Strategist",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [500, 300],
+      "notes": "ใช้ Anthropic credential"
+    },
+    {
+      "parameters": {
+        "model": "claude-sonnet-4-5-20250929",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "คุณคือ Mosses Data Analyst Agent\n\nวิเคราะห์ข้อมูลประจำวัน:\n1. ยอดขายวันนี้ เทียบเมื่อวาน/สัปดาห์ก่อน\n2. Content performance (views, engagement)\n3. Ad ROAS แต่ละ platform\n4. Anomaly detection\n5. Actionable recommendations\n\nตอบเป็น JSON format:\n{\n  \"revenue\": {\"today\": 0, \"vs_yesterday\": \"+0%\"},\n  \"orders\": {\"count\": 0, \"aov\": 0},\n  \"top_product\": \"...\",\n  \"content_performance\": [{\"title\": \"...\", \"views\": 0, \"engagement\": \"0%\"}],\n  \"anomalies\": [],\n  \"recommendations\": [\"...\"],\n  \"score\": 7\n}"
+            },
+            {
+              "role": "user",
+              "content": "=วิเคราะห์ข้อมูลวันที่ {{ $now.format('yyyy-MM-dd') }}\n\nData:\n{{ JSON.stringify($json.analytics_data || 'ยังไม่มีข้อมูล ให้สร้าง mock analysis ตาม pattern ปกติ') }}"
+            }
+          ]
+        }
+      },
+      "id": "claude-analytics",
+      "name": "🧠 Claude: Data Analyst",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [500, 600],
+      "notes": "ใช้ Anthropic credential"
+    },
+    {
+      "parameters": {
+        "model": "claude-sonnet-4-5-20250929",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "คุณคือ Mosses DevOps Agent ทำ maintenance ระบบ\n\nตรวจสอบ:\n1. Database size & performance\n2. Error logs วันนี้\n3. API rate limit usage\n4. Storage usage\n5. แนะนำ cleanup ถ้าจำเป็น\n\nตอบเป็น JSON format:\n{\n  \"db_status\": {\"size_mb\": 0, \"connections\": 0, \"slow_queries\": 0},\n  \"errors_today\": 0,\n  \"storage\": {\"r2_used\": \"0MB\", \"supabase_used\": \"0MB\"},\n  \"cleanup_actions\": [],\n  \"status\": \"healthy/warning/critical\"\n}"
+            },
+            {
+              "role": "user",
+              "content": "=Maintenance check {{ $now.format('yyyy-MM-dd HH:mm') }}"
+            }
+          ]
+        }
+      },
+      "id": "claude-maintenance",
+      "name": "🧠 Claude: Maintenance",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [500, 900],
+      "notes": "ใช้ Anthropic credential"
+    },
+    {
+      "parameters": {
+        "model": "claude-sonnet-4-5-20250929",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "คุณคือ Mosses Orchestrator สรุปผลทั้งวัน\n\nสรุป:\n1. Health status ตลอดวัน\n2. Content ที่สร้าง/publish\n3. ยอดขายรวม + metrics\n4. ปัญหาที่เจอ + วิธีแก้\n5. วางแผนพรุ่งนี้\n6. ให้คะแนนวันนี้ 1-10\n\nตอบเป็น LINE-friendly format (ใช้ emoji, กระชับ, อ่านง่าย)"
+            },
+            {
+              "role": "user",
+              "content": "=สรุปวันที่ {{ $now.format('yyyy-MM-dd') }}\n\nข้อมูลจากทุกรอบ:\n{{ JSON.stringify($json.all_rounds_data || 'สรุปจากข้อมูลที่มีในระบบ') }}"
+            }
+          ]
+        }
+      },
+      "id": "claude-summary",
+      "name": "🧠 Claude: Daily Summary",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [500, 1200],
+      "notes": "ใช้ Anthropic credential"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "agent_runs",
+        "fieldsToSend": {
+          "fieldValues": [
+            { "fieldName": "run_id", "fieldValue": "={{ $json.run_id }}" },
+            { "fieldName": "schedule_round", "fieldValue": "={{ $json.round }}" },
+            { "fieldName": "agent_name", "fieldValue": "=orchestrator" },
+            { "fieldName": "task_type", "fieldValue": "={{ $json.round }}" },
+            { "fieldName": "output_summary", "fieldValue": "={{ JSON.stringify($json.response) }}" },
+            { "fieldName": "status", "fieldValue": "success" }
+          ]
+        }
+      },
+      "id": "supabase-log",
+      "name": "📝 Log to Supabase",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [750, 0],
+      "notes": "Log ทุกรอบลง agent_runs table"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"{{ $env.LINE_USER_ID }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{ $json.line_message }}\"\n    }\n  ]\n}"
+      },
+      "id": "line-notify",
+      "name": "📱 LINE Notify",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1000, 0],
+      "notes": "ส่ง notification ให้ Mosses ผ่าน LINE"
+    }
+  ],
+  "connections": {
+    "🌅 Morning (06:00)": {
+      "main": [[{ "node": "Set Context (Morning)", "type": "main", "index": 0 }]]
+    },
+    "📝 Content (09:00)": {
+      "main": [[{ "node": "Set Context (Content)", "type": "main", "index": 0 }]]
+    },
+    "📊 Analytics (14:00)": {
+      "main": [[{ "node": "Set Context (Analytics)", "type": "main", "index": 0 }]]
+    },
+    "🔧 Maintenance (18:00)": {
+      "main": [[{ "node": "Set Context (Maintenance)", "type": "main", "index": 0 }]]
+    },
+    "📈 Summary (22:00)": {
+      "main": [[{ "node": "Set Context (Summary)", "type": "main", "index": 0 }]]
+    },
+    "Set Context (Morning)": {
+      "main": [[{ "node": "🧠 Claude: Morning Health", "type": "main", "index": 0 }]]
+    },
+    "Set Context (Content)": {
+      "main": [[{ "node": "🧠 Claude: Content Strategist", "type": "main", "index": 0 }]]
+    },
+    "Set Context (Analytics)": {
+      "main": [[{ "node": "🧠 Claude: Data Analyst", "type": "main", "index": 0 }]]
+    },
+    "Set Context (Maintenance)": {
+      "main": [[{ "node": "🧠 Claude: Maintenance", "type": "main", "index": 0 }]]
+    },
+    "Set Context (Summary)": {
+      "main": [[{ "node": "🧠 Claude: Daily Summary", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "tags": [
+    { "name": "autonomous" },
+    { "name": "orchestrator" },
+    { "name": "production" }
+  ]
+}

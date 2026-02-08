@@ -1,7 +1,31 @@
 # 🤖 Mosses Multi-Agent Ecosystem
 ## Complete Agent Directory
 
-### Last Updated: 2026-02-07
+### Last Updated: 2026-02-08
+
+---
+
+## 🎯 Domain specialist agents (high-level)
+
+| Agent | Role | Tasks |
+| ----- | ----- | ----- |
+| **Orchestrator** (Master Agent) | ประสานงานระหว่าง agents ทั้งหมด | Task distribution, monitoring, scaling |
+| **Code Agent** | Development specialist | Code review, optimization, debugging, refactoring, security audits |
+| **Content Agent** (Bangkok 3099) | Content pipeline | Spiritual/philosophical AI video (Sora, GPT-4, DALL-E), 6h cycle, YouTube/FB/TikTok/LINE, analytics & n8n |
+| **Business Agent** (Sabi Shop) | Business operations | Employee tracking, inventory, customer service automation |
+| **Security Agent** | Monitoring & security | Vulnerability scans, API key rotation, alerts |
+
+---
+
+## 🏢 Multi-business context (Master Agent)
+
+| Business | Scope | Key metrics |
+|----------|--------|-------------|
+| **Bangkok 3099** | Content pipeline (AI video, social, analytics) | Automated content **every 6 hours** |
+| **Sabi Shop** | Operations (employees, inventory, customer service) | **9 employees**, **60–80K THB/month** revenue |
+
+- **n8n**: `https://mossad.app.n8n.cloud` — production workflows (Morning 06:00, Content 09:00, Analytics 14:00, Maintenance 18:00, Summary 22:00).
+- **LINE**: Important updates and daily summaries sent via n8n LINE Notify node.
 
 ---
 
@@ -21,7 +45,11 @@
 | 10 | **Data Engineer** | Database & Data Pipeline | Sonnet | ✅ Active |
 | 11 | **DevOps** | CI/CD, Infra, Monitoring, Security | Sonnet | ✅ **NEW** |
 | 12 | **Data Analyst** | Analytics, Reports, BI, KPI | Sonnet | ✅ **NEW** |
-| 13 | **Marketing Compliance** | Policy Check, กฎหมาย, PDPA | Sonnet | ✅ **NEW** |
+| 13 | **Marketing Compliance** | Policy Check, กฎหมาย, PDPA | Sonnet | ✅ Active |
+| 14 | **Code Agent** | Development specialist | Sonnet | ✅ Active |
+| 15 | **Content Agent** | Bangkok 3099 — spiritual/philosophical video, 6h gen, Sora/GPT-4/DALL-E, social + LINE, n8n | Sonnet | ✅ Active |
+| 16 | **Business Agent** | Sabi Shop operations | Sonnet | ✅ Active |
+| 17 | **Security Agent** | Monitoring & security | Sonnet | ✅ Active |
 
 ---
 
@@ -118,6 +146,10 @@ claude --agent devops "เช็ค health check ทุก service"
 claude --agent data-analyst "สรุปยอดขายสัปดาห์นี้"
 claude --agent marketing-compliance "ตรวจ ad copy นี้ก่อน launch"
 claude --agent content-strategist "วางแผน content เดือนหน้า"
+claude --agent code-agent "review โค้ดนี้และเสนอ optimization"
+claude --agent content-agent "วางแผนโพสต์ Bangkok 3099 สัปดาห์หน้า"
+claude --agent business-agent "ออกแบบระบบติดตามพนักงาน Sabi Shop"
+claude --agent security-agent "สแกน vulnerability และเช็ค API key rotation"
 
 # ใช้ Pipeline
 claude --agent orchestrator "สร้าง feature ใหม่: [description]"
@@ -143,6 +175,10 @@ mosses-agents/
         ├── seo-optimizer.md         # 🔎 SEO/AIO
         ├── data-engineer.md         # 🗄️ Database & Pipelines
         ├── devops.md                # ⚙️ Infrastructure & CI/CD  [NEW]
-        ├── data-analyst.md          # 📊 Analytics & BI          [NEW]
-        └── marketing-compliance.md  # 🛡️ Policy & Legal         [NEW]
+        ├── data-analyst.md          # 📊 Analytics & BI
+        ├── marketing-compliance.md  # 🛡️ Policy & Legal
+        ├── code-agent.md            # 🔧 Development specialist
+        ├── content-agent.md         # 🎬 Bangkok 3099 content
+        ├── business-agent.md       # 🏪 Sabi Shop operations
+        └── security-agent.md       # 🔐 Monitoring & security
 ```
