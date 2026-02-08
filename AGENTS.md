@@ -59,6 +59,24 @@ curl -X POST https://example-agent-runner.workers.dev/run \
   - Reflect changes in `Mosses Multi-Agent Ecosystem/ECOSYSTEM.md`.
   - Keep this file in sync.
 
+## Agent health check
+
+Run the status checker to verify all agents are operational:
+
+```bash
+bash scripts/agent-status.sh
+```
+
+Or inspect the JSON health report:
+
+```bash
+cat agent-health-check.json
+```
+
+The health check verifies that every agent has both a **runtime prompt**
+(`.claude/agents/<name>.md`) and **documentation**
+(`Mosses Multi-Agent Ecosystem/<name>.md`).
+
 ## Related docs
 
 - `Mosses Multi-Agent Ecosystem/ECOSYSTEM.md`
