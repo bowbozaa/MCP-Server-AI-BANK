@@ -1,0 +1,201 @@
+{
+  "name": "MOSSES Autonomous 24hr System",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6,9,14,18,22 * * *"
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "id": "schedule-trigger-1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Determine which round this is\nconst hour = new Date().getHours();\n\nlet round, agent, task;\n\nswitch(hour) {\n  case 6:\n    round = 'Morning';\n    agent = 'devops';\n    task = 'Health check all services and report status';\n    break;\n  case 9:\n    round = 'Content';\n    agent = 'content-agent';\n    task = 'Generate and schedule Bangkok 3099 content';\n    break;\n  case 14:\n    round = 'Analytics';\n    agent = 'data-analyst';\n    task = 'Analyze metrics and create daily report';\n    break;\n  case 18:\n    round = 'Maintenance';\n    agent = 'devops';\n    task = 'System maintenance and cleanup';\n    break;\n  case 22:\n    round = 'Summary';\n    agent = 'orchestrator';\n    task = 'Create daily summary and plan tomorrow';\n    break;\n  default:\n    round = 'Unknown';\n    agent = 'orchestrator';\n    task = 'Status check';\n}\n\nreturn {\n  round,\n  agent,\n  task,\n  timestamp: new Date().toISOString()\n};"
+      },
+      "name": "Determine Round",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300],
+      "id": "code-determine-round"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://mosses-agent-runner.your-subdomain.workers.dev/run",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": []
+        },
+        "jsonBody": "={\n  \"agent\": \"{{$json.agent}}\",\n  \"userMessage\": \"{{$json.task}}\"\n}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "name": "Call Agent Runner",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [650, 300],
+      "id": "http-agent-runner",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "runner-api-key",
+          "name": "Agent Runner API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "agent_logs",
+        "columns": "round,agent,task,response,status,created_at",
+        "values": "={{$json.round}},={{$json.agent}},={{$json.task}},={{$json.response}},success,={{$now}}"
+      },
+      "name": "Log to Supabase",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "id": "supabase-log",
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-main",
+          "name": "Supabase Main"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "message": "=🎖️ MOSSES AUTO RUN\n\nRound: {{$json.round}}\nAgent: {{$json.agent}}\nTask: {{$json.task}}\n\n✅ Complete\nTime: {{$json.responseTime}}ms\n\n{{$now.format('HH:mm')}} | {{$now.format('DD/MM/YYYY')}}"
+      },
+      "name": "LINE Notify",
+      "type": "n8n-nodes-base.lineNotify",
+      "typeVersion": 1,
+      "position": [1050, 300],
+      "id": "line-notify",
+      "credentials": {
+        "lineNotifyOAuth2Api": {
+          "id": "line-notify-mosses",
+          "name": "LINE Notify MOSSES"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.success}}",
+              "value2": "false"
+            }
+          ]
+        }
+      },
+      "name": "If Error",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [850, 500],
+      "id": "if-error"
+    },
+    {
+      "parameters": {
+        "message": "=🔴 MOSSES ERROR\n\nRound: {{$json.round}}\nAgent: {{$json.agent}}\nError: {{$json.error}}\n\nกรุณาตรวจสอบด่วน!"
+      },
+      "name": "LINE Alert Error",
+      "type": "n8n-nodes-base.lineNotify",
+      "typeVersion": 1,
+      "position": [1050, 500],
+      "id": "line-alert-error",
+      "credentials": {
+        "lineNotifyOAuth2Api": {
+          "id": "line-notify-mosses",
+          "name": "LINE Notify MOSSES"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Determine Round",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Round": {
+      "main": [
+        [
+          {
+            "node": "Call Agent Runner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Agent Runner": {
+      "main": [
+        [
+          {
+            "node": "Log to Supabase",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Supabase": {
+      "main": [
+        [
+          {
+            "node": "LINE Notify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Error": {
+      "main": [
+        [
+          {
+            "node": "LINE Alert Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "Asia/Bangkok"
+  }
+}
