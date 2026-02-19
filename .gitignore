@@ -17,7 +17,7 @@ desktop.ini
 .env
 .env.local
 .dev.vars
-.cursor/mcp.json
+**/.cursor/mcp.json
 
 # Build
 dist/
