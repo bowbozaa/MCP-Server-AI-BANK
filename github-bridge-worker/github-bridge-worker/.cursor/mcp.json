@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "flybridge": {
+      "url": "https://flybridge.banknakorn39.workers.dev/mcp/sse",
+      "headers": {
+        "Authorization": "Bearer flybridge-mosses-2025"
+      }
+    }
+  }
+}
