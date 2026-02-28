@@ -7,16 +7,29 @@ node_modules/
 Thumbs.db
 desktop.ini
 
-# IDE
+# IDE & AI Tools
 .vscode/
 .idea/
+.cursor/
+.claude/
+.gemini/
 *.swp
 *.swo
 
-# Secrets
+# Secrets & Credentials
 .env
-.env.local
+.env.*
 .dev.vars
+*.credentials
+*.secret
+*.pem
+*.key
+*.p12
+*.pfx
+service-account*.json
+firebase*.json
+oauth_creds.json
+**/mcp.json
 
 # Build
 dist/
@@ -25,5 +38,3 @@ dist/
 # Sensitive files
 *.dmg
 รหัส.txt
-*.credentials
-*.secret
