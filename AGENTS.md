@@ -8,6 +8,13 @@
 
 This repository powers the **Mosses Multi-Agent Ecosystem** — a coordinated system of 13 specialized AI agents ("MOSSES ARMY") plus a **GitHub Bridge Worker** (Cloudflare Worker) that proxies between Claude.ai/Cursor and the GitHub API.
 
+### Source of Truth
+
+- `.claude/agents/` is the runtime prompt directory used by tooling.
+- `Mosses Multi-Agent Ecosystem/` contains long-form docs and guides.
+- Agent names are lowercase and hyphenated; keep names stable across tools.
+- When adding or renaming agents, update `.claude/agents/<agent>.md`, the corresponding doc in `Mosses Multi-Agent Ecosystem/`, `Mosses Multi-Agent Ecosystem/ECOSYSTEM.md`, and this file.
+
 ### Repository Structure
 
 ```
@@ -37,6 +44,9 @@ This repository powers the **Mosses Multi-Agent Ecosystem** — a coordinated sy
 │   ├── AUTONOMOUS-RUN.md        # Autonomous operation guide
 │   ├── agent-runner-api-spec.md # Agent runner API specification
 │   └── *.md                     # Individual agent reference docs
+├── scripts/
+│   └── agent-status.sh          # Agent health check script
+├── agent-health-check.json      # JSON health report for all agents
 ├── .gitignore
 └── AGENTS.md                    # This file
 ```
@@ -56,6 +66,51 @@ This repository powers the **Mosses Multi-Agent Ecosystem** — a coordinated sy
 | AI            | Claude API (Anthropic), OpenAI     | Agent intelligence               |
 | Messaging     | LINE OA, Telegram                  | Notifications & alerts           |
 | Version Ctrl  | GitHub (Flybridge)                 | Source code, CI/CD               |
+
+---
+
+## Available Agents
+
+| Agent name | Primary focus | Typical use |
+| ---------- | ------------- | ----------- |
+| orchestrator | Overall coordination and task routing | Multi-step or multi-domain work |
+| architect | System architecture and design | New systems, major refactors |
+| n8n-engineer | Automation and workflows | n8n builds, integrations |
+| frontend-dev | UI and frontend implementation | Web UI, UX tasks |
+| code-reviewer | QA and code review | Risk checks, audits |
+| debugger | Root-cause analysis | Bugs, incidents, failures |
+| deployer | Release and deployment | Shipping, rollbacks |
+| content-strategist | Content planning and copy | Content, messaging |
+| seo-optimizer | SEO and discovery | SEO, metadata, search |
+| data-engineer | Data models and pipelines | DBs, ETL, storage |
+| devops | Infra, CI/CD, monitoring | Cloud, pipelines, ops |
+| data-analyst | Reporting and analytics | KPIs, dashboards |
+| marketing-compliance | Policy and legal checks | Compliance reviews |
+
+---
+
+## Quick Start
+
+Run an agent directly:
+
+```bash
+claude --agent orchestrator "Plan and coordinate a new feature"
+claude --agent devops "Check service health and summarize"
+claude --agent code-reviewer "Review this change for regressions"
+claude --agent data-analyst "สรุปยอดขายสัปดาห์นี้"
+claude --agent marketing-compliance "ตรวจ ad copy นี้ก่อน launch"
+```
+
+Run via an agent-runner API (see `Mosses Multi-Agent Ecosystem/agent-runner-api-spec.md`):
+
+```bash
+curl -X POST https://example-agent-runner.workers.dev/run \
+  -H "Authorization: Bearer $RUNNER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"agent":"devops","userMessage":"Check service health and summarize"}'
+```
+
+Use `orchestrator` when the task spans multiple domains or requires a plan. Prefer the most specific agent for focused tasks.
 
 ---
 
@@ -162,6 +217,24 @@ Never hardcode these values. They are injected at runtime by the Cloudflare Work
 
 ---
 
+## Agent Health Check
+
+Run the status checker to verify all agents are operational:
+
+```bash
+bash scripts/agent-status.sh
+```
+
+Or inspect the JSON health report:
+
+```bash
+cat agent-health-check.json
+```
+
+The health check verifies that every agent has both a **runtime prompt** (`.claude/agents/<name>.md`) and **documentation** (`Mosses Multi-Agent Ecosystem/<name>.md`).
+
+---
+
 ## Development Workflow
 
 1. **Editing agents**: Modify files in `.claude/agents/`. Maintain the YAML frontmatter format and the MOSSES ARMY theming.
@@ -178,3 +251,11 @@ Never hardcode these values. They are injected at runtime by the Cloudflare Work
 - **MCP sessions are in-memory** — They reset on worker restart. This is by design for the edge runtime.
 - **Agent model selection** — Only Orchestrator and Architect use `opus`. All other agents use `sonnet` to optimize cost.
 - **Thai + English mix** — All user-facing output should be in Thai with English technical terms. Code, variable names, and API contracts remain in English.
+
+---
+
+## Related Docs
+
+- `Mosses Multi-Agent Ecosystem/ECOSYSTEM.md`
+- `Mosses Multi-Agent Ecosystem/AUTONOMOUS-RUN.md`
+- `Mosses Multi-Agent Ecosystem/agent-runner-api-spec.md`
