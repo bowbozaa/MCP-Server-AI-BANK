@@ -259,3 +259,36 @@ The health check verifies that every agent has both a **runtime prompt** (`.clau
 - `Mosses Multi-Agent Ecosystem/ECOSYSTEM.md`
 - `Mosses Multi-Agent Ecosystem/AUTONOMOUS-RUN.md`
 - `Mosses Multi-Agent Ecosystem/agent-runner-api-spec.md`
+
+## Cursor Cloud specific instructions
+
+### Repository overview
+
+This repo contains two things: (1) markdown-based agent prompts/docs for the Mosses AI Army (13 agents), and (2) a single deployable Cloudflare Worker called **Flybridge** (`github-bridge-worker/github-bridge-worker/`). The Worker is the only runnable service. There are no linters, formatters, or automated test suites configured in this repo.
+
+### Running the Bridge Worker locally
+
+```bash
+cd github-bridge-worker/github-bridge-worker
+npm install
+npx wrangler dev --port 8787
+```
+
+For authenticated endpoints, create `github-bridge-worker/github-bridge-worker/.dev.vars` with:
+
+```
+BRIDGE_API_KEY=<any-test-key>
+GITHUB_PAT=<real-or-dummy-token>
+```
+
+The `.dev.vars` file is auto-read by wrangler. The `/health` endpoint does not require auth; all other endpoints do.
+
+### Agent health check
+
+Run `bash scripts/agent-status.sh` from the repo root. This verifies all 13 agents have both a runtime prompt (`.claude/agents/<name>.md`) and docs (`Mosses Multi-Agent Ecosystem/<name>.md`).
+
+### Gotchas
+
+- The `package.json` in the worker directory has **no dependencies listed** — wrangler is the only dev dependency needed and is installed via `npm install --save-dev wrangler` or invoked via `npx`.
+- When restarting `wrangler dev`, you must kill the old process first or use a different port; it does not auto-release the port.
+- The Worker uses in-memory session storage (`Map`) for legacy SSE MCP sessions; sessions reset on every restart.
